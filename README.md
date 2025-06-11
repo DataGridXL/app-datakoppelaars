@@ -92,12 +92,4 @@ Open daarna https://localhost:5173 en vertrouw het certificaat (de browser zal w
 
 # Architectuur
 
-+---------------------+ +------------------------------+ +---------------------------+
-| n8n Workflow | | Supabase | | React App |
-+---------------------+ +------------------------------+ +---------------------------+
-| - Trigger | | - orders table | | /login → Auth via Supabase|
-| - Auth: JWT via API | ----> | - FK: user_id → auth.users | <---- | /dashboard |
-| - Download ZIP | | - RLS: user_id = auth.uid() | <---- | - Line chart: omzet/dag |
-| - Unzip & Parse CSV | +------------------------------+ | - Pie chart: top producten |
-| - POST naar Supabase| ---> | /new-order (formulier) |
-+---------------------+ +---------------------------+
+<pre lang="md"><code> ``` +---------------------+ +------------------------------+ +---------------------------+ | n8n Workflow | | Supabase | | React App | +---------------------+ +------------------------------+ +---------------------------+ | - Trigger | | - orders table | | /login → Auth via Supabase| | - Auth: JWT via API | ----> | - FK: user_id → auth.users | <---- | /dashboard | | - Download ZIP | | - RLS: user_id = auth.uid() | <---- | - Line chart: omzet/dag | | - Unzip & Parse CSV | +------------------------------+ | - Pie chart: producten | | - POST naar Supabase| ---> | /new-order (formulier) | +---------------------+ +---------------------------+ ``` </code></pre>
