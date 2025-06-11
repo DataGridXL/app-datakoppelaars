@@ -92,6 +92,7 @@ Open daarna https://localhost:5173 en vertrouw het certificaat (de browser zal w
 
 # Mermaid-diagram
 
+```mermaid
 flowchart TD
     subgraph Automatisering [n8n Workflow]
         A1[Trigger: Execute Workflow]
