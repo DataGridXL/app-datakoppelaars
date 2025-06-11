@@ -96,7 +96,7 @@ Open daarna https://localhost:5173 en vertrouw het certificaat (de browser zal w
 flowchart TD
     subgraph Automatisering [n8n Workflow]
         A1[Trigger: Execute Workflow]
-        A2[POST naar Supabase Auth\n(JWT token)]
+        A2[POST naar Supabase Auth<br/>(JWT token)]
         A3[Download ZIP via HTTP Request]
         A4[Unzip bestanden]
         A5[Split naar individuele CSV's (Code Node)]
@@ -109,7 +109,7 @@ flowchart TD
         B1[orders-table]
         B2[users (auth.users)]
         B1 -->|foreign key| B2
-        B3[RLS: alleen eigen orders zichtbaar\n(user_id = auth.uid())]
+        B3[RLS: alleen eigen orders zichtbaar<br/>(user_id = auth.uid())]
     end
 
     subgraph Frontend [React App in Docker]
