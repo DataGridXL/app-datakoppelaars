@@ -16,6 +16,15 @@ Optioneel kun je de dev-server met lokaal SSL (HTTPS) starten zodra je certifica
 HTTPS=true SSL_CRT_FILE=./localhost.pem SSL_KEY_FILE=./localhost-key.pem npm run dev
 ```
 
+## Supabase gegevens
+
+Maak een `.env.local` bestand aan in de root-map, met de keys uit je Supabase account:
+
+```
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+```
+
 ## Docker
 
 Build en run de applicatie in Docker:
