@@ -41,61 +41,76 @@ export default function NewOrder() {
   }
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Nieuwe Order</h2>
-      <Link to="/dashboard" className="inline-block text-sm text-slate-900 hover:underline mb-4">
-        Terug naar dashboard
-      </Link>
-      {errorMsg && (
-        <div className="bg-red-200 text-red-800 p-2 rounded mb-4">
-          {errorMsg}
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8">
+      <div className="max-w-4xl mx-auto bg-white shadow-sm border border-gray-200 rounded-lg p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h2 className="text-3xl font-bold text-gray-900">Nieuwe Order</h2>
+          <Link
+            to="/dashboard"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Terug naar dashboard
+          </Link>
         </div>
-      )}
-      {successMsg && (
-        <div className="bg-green-200 text-green-800 p-2 rounded mb-4">
-          {successMsg}
-        </div>
-      )}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Product</label>
-          <input
-            type="text"
-            className="border rounded px-3 py-2 w-full"
-            value={product}
-            onChange={(e) => setProduct(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Aantal</label>
-          <input
-            type="number"
-            className="border rounded px-3 py-2 w-full"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Bedrag</label>
-          <input
-            type="number"
-            step="0.01"
-            className="border rounded px-3 py-2 w-full"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-slate-900 px-4 py-2 rounded hover:bg-slate-800"
-        >
-          {loading ? 'Verzenden...' : 'Verstuur Order'}
-        </button>
-      </form>
+        {errorMsg && (
+          <div className="bg-red-100 text-red-800 px-4 py-2 rounded">
+            {errorMsg}
+          </div>
+        )}
+        {successMsg && (
+          <div className="bg-green-100 text-green-800 px-4 py-2 rounded">
+            {successMsg}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Product
+            </label>
+            <input
+              type="text"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={product}
+              onChange={(e) => setProduct(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Aantal
+            </label>
+            <input
+              type="number"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Bedrag
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 font-medium px-4 py-2 rounded-md shadow transition-colors"
+            >
+              {loading ? 'Verzenden...' : 'Verstuur Order'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

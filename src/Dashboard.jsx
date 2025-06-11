@@ -131,97 +131,156 @@ export default function Dashboard() {
     await supabase.auth.signOut()
   }
 
+const formatOrderId = id =>
+  typeof id === 'string' && id.length > 4
+    ? `${id.slice(0, 2)}...${id.slice(-2)}`
+    : id
+
+const formatCreatedAt = timestamp => {
+  const date = new Date(timestamp)
+  const day = date.getDate()
+  const month = date.getMonth() + 1
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Dashboard</h2>
-        <div className="space-x-2">
+    <>
+      {`${day}-${month}`}
+      <br />
+      {`${hours}:${minutes}`}
+    </>
+  )
+}
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Dashboard</h1>
           <Link
             to="/new-order"
-            className="bg-slate-900 px-4 py-2 rounded hover:bg-slate-800"
+            className="bg-grey-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-sm transition-colors"
           >
             Nieuwe Order
           </Link>
+        </div>
+
+        <div className="bg-white shadow-sm border border-gray-200 rounded p-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="flex flex-col sm:flex-row gap-4 flex-1">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-700">Van datum</label>
+                <DatePicker
+                  selected={startDate}
+                  onChange={date => setStartDate(date)}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Van datum"
+                  className="border border-gray-300 rounded px-2 py-1 w-full sm:w-auto"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-700">Tot datum</label>
+                <DatePicker
+                  selected={endDate}
+                  onChange={date => setEndDate(date)}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Tot datum"
+                  className="border border-gray-300 rounded px-2 py-1 w-full sm:w-auto"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700 opacity-0 sm:opacity-100">Reset</label>
+              <button
+                onClick={clearFilters}
+                className="border border-gray-300 px-4 py-2 rounded hover:bg-gray-50"
+              >
+                Alle
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white shadow-sm border border-gray-200 rounded p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Omzet per dag</h3>
+            <div className="h-[300px] w-full">
+              <Line data={revenueData} />
+            </div>
+          </div>
+
+          <div className="bg-white shadow-sm border border-gray-200 rounded p-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Top 5 producten</h3>
+            <div className="h-[300px] w-full">
+              <Pie data={topProductsData} />
+            </div>
+          </div>
+        </div>
+
+        {loading ? (
+          <p>Loading orders...</p>
+        ) : (
+          <div className="bg-white shadow-sm border border-gray-200 rounded p-4 overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th
+                    onClick={() => requestSort('order_id')}
+                    className="text-left py-2 px-3 font-medium text-gray-700 cursor-pointer"
+                  >
+                    Order ID{sortConfig.key === 'order_id' ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''}
+                  </th>
+                  <th
+                    onClick={() => requestSort('created_at')}
+                    className="text-left py-2 px-3 font-medium text-gray-700 cursor-pointer"
+                  >
+                    Aangemaakt{sortConfig.key === 'created_at' ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''}
+                  </th>
+                  <th
+                    onClick={() => requestSort('product')}
+                    className="text-left py-2 px-3 font-medium text-gray-700 cursor-pointer"
+                  >
+                    Product{sortConfig.key === 'product' ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''}
+                  </th>
+                  <th
+                    onClick={() => requestSort('quantity')}
+                    className="text-left py-2 px-3 font-medium text-gray-700 cursor-pointer"
+                  >
+                    Aantal{sortConfig.key === 'quantity' ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''}
+                  </th>
+                  <th
+                    onClick={() => requestSort('amount')}
+                    className="text-left py-2 px-3 font-medium text-gray-700 cursor-pointer"
+                  >
+                    Bedrag{sortConfig.key === 'amount' ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedOrders.map(order => (
+                  <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <td className="py-3 px-3 font-mono text-sm text-blue-600">{formatOrderId(order.order_id)}</td>
+                    <td className="py-3 px-3 text-gray-600">{formatCreatedAt(order.created_at)}</td>
+                    <td className="py-3 px-3 text-gray-800">{order.product}</td>
+                    <td className="py-3 px-3 text-gray-800">{order.quantity}</td>
+                    <td className="py-3 px-3 text-gray-800">{order.amount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div className="flex justify-center pt-8">
           <button
-            className="bg-slate-900 px-4 py-2 rounded hover:bg-slate-800"
+            className="bg-slate-900 px-6 py-3 rounded-lg hover:bg-slate-800 transition-colors"
             onClick={handleSignOut}
           >
-            Sign Out
+            Uitloggen
           </button>
         </div>
       </div>
-      <div className="mb-4 flex items-center space-x-2">
-        <DatePicker
-          selected={startDate}
-          onChange={date => setStartDate(date)}
-          dateFormat="yyyy-MM-dd"
-          placeholderText="Van datum"
-          className="border border-gray-300 rounded px-2 py-1"
-        />
-        <DatePicker
-          selected={endDate}
-          onChange={date => setEndDate(date)}
-          dateFormat="yyyy-MM-dd"
-          placeholderText="Tot datum"
-          className="border border-gray-300 rounded px-2 py-1"
-        />
-        <button
-          onClick={clearFilters}
-          className="bg-slate-700 px-3 py-1 rounded hover:bg-slate-600"
-        >
-          Alle
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        <div>
-          <h3 className="text-xl font-semibold mb-2">Omzet per dag</h3>
-          <Line data={revenueData} />
-        </div>
-        <div>
-          <h3 className="text-xl font-semibold mb-2">Top 5 producten</h3>
-          <Pie data={topProductsData} />
-        </div>
-      </div>
-
-      {loading ? (
-        <p>Loading orders...</p>
-      ) : (
-        <table className="min-w-full bg-white border">
-          <thead>
-            <tr>
-              <th onClick={() => requestSort('order_id')} className="py-2 px-4 border cursor-pointer">
-                Order ID{sortConfig.key === 'order_id' ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''}
-              </th>
-              <th onClick={() => requestSort('created_at')} className="py-2 px-4 border cursor-pointer">
-                Aangemaakt{sortConfig.key === 'created_at' ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''}
-              </th>
-              <th onClick={() => requestSort('product')} className="py-2 px-4 border cursor-pointer">
-                Product{sortConfig.key === 'product' ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''}
-              </th>
-              <th onClick={() => requestSort('quantity')} className="py-2 px-4 border cursor-pointer">
-                Aantal{sortConfig.key === 'quantity' ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''}
-              </th>
-              <th onClick={() => requestSort('amount')} className="py-2 px-4 border cursor-pointer">
-                Bedrag{sortConfig.key === 'amount' ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : ''}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedOrders.map(order => (
-              <tr key={order.id}>
-                <td className="py-2 px-4 border">{order.order_id}</td>
-                <td className="py-2 px-4 border">
-                  {new Date(order.created_at).toLocaleString()}
-                </td>
-                <td className="py-2 px-4 border">{order.product}</td>
-                <td className="py-2 px-4 border">{order.quantity}</td>
-                <td className="py-2 px-4 border">{order.amount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
     </div>
   )
 }
