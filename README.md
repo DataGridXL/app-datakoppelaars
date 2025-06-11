@@ -89,3 +89,35 @@ Start de dev-server met HTTPS:
 HTTPS=true SSL_CRT_FILE=./localhost.pem SSL_KEY_FILE=./localhost-key.pem npm run dev
 ```
 Open daarna https://localhost:5173 en vertrouw het certificaat (de browser zal waarschuwen voor self-signed certificaten; importeer het in je systeemtruststore of kies in Chrome “Proceed to localhost (unsafe)”).
+
+# Mermaid-diagram
+
+flowchart TD
+    subgraph Automatisering [n8n Workflow]
+        A1[Trigger: Execute Workflow]
+        A2[POST naar Supabase Auth\n(JWT token)]
+        A3[Download ZIP via HTTP Request]
+        A4[Unzip bestanden]
+        A5[Split naar individuele CSV's (Code Node)]
+        A6[Parse CSV → JSON]
+        A7[POST JSON naar Supabase 'orders']
+        A1 --> A2 --> A3 --> A4 --> A5 --> A6 --> A7
+    end
+
+    subgraph Supabase [Supabase]
+        B1[orders-table]
+        B2[users (auth.users)]
+        B1 -->|foreign key| B2
+        B3[RLS: alleen eigen orders zichtbaar\n(user_id = auth.uid())]
+    end
+
+    subgraph Frontend [React App in Docker]
+        C1[/login → Supabase Auth]
+        C2[/dashboard → charts + filter]
+        C3[/new-order → formulier]
+        C2 -->|leest orders| B1
+        C3 -->|voegt orders toe| B1
+        C1 -->|login met email/wachtwoord| B2
+    end
+
+    A7 --> B1
