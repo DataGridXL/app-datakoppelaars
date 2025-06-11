@@ -90,35 +90,14 @@ HTTPS=true SSL_CRT_FILE=./localhost.pem SSL_KEY_FILE=./localhost-key.pem npm run
 ```
 Open daarna https://localhost:5173 en vertrouw het certificaat (de browser zal waarschuwen voor self-signed certificaten; importeer het in je systeemtruststore of kies in Chrome “Proceed to localhost (unsafe)”).
 
-# Mermaid-diagram
+# Architectuur
 
-```mermaid
-flowchart TD
-    subgraph Automatisering [n8n Workflow]
-        A1[Trigger: Execute Workflow]
-        A2[POST naar Supabase Auth<br/>(JWT token)]
-        A3[Download ZIP via HTTP Request]
-        A4[Unzip bestanden]
-        A5[Split naar individuele CSV's (Code Node)]
-        A6[Parse CSV → JSON]
-        A7[POST JSON naar Supabase 'orders']
-        A1 --> A2 --> A3 --> A4 --> A5 --> A6 --> A7
-    end
-
-    subgraph Supabase [Supabase]
-        B1[orders-table]
-        B2[users (auth.users)]
-        B1 -->|foreign key| B2
-        B3[RLS: alleen eigen orders zichtbaar<br/>(user_id = auth.uid())]
-    end
-
-    subgraph Frontend [React App in Docker]
-        C1[/login → Supabase Auth]
-        C2[/dashboard → charts + filter]
-        C3[/new-order → formulier]
-        C2 -->|leest orders| B1
-        C3 -->|voegt orders toe| B1
-        C1 -->|login met email/wachtwoord| B2
-    end
-
-    A7 --> B1
++---------------------+ +------------------------------+ +---------------------------+
+| n8n Workflow | | Supabase | | React App |
++---------------------+ +------------------------------+ +---------------------------+
+| - Trigger | | - orders table | | /login → Auth via Supabase|
+| - Auth: JWT via API | ----> | - FK: user_id → auth.users | <---- | /dashboard |
+| - Download ZIP | | - RLS: user_id = auth.uid() | <---- | - Line chart: omzet/dag |
+| - Unzip & Parse CSV | +------------------------------+ | - Pie chart: top producten |
+| - POST naar Supabase| ---> | /new-order (formulier) |
++---------------------+ +---------------------------+
